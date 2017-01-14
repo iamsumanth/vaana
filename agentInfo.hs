@@ -36,7 +36,8 @@ data Agents = Agents {
 
 instance FromJSON Agents where
     parseJSON = withObject "agents" $ \o -> do
-        k <- parseJSON (Object o)
+        let m = o .: "_embedded"
+        k <-  m
         let agents = (k:[])
         return Agents{..}
 

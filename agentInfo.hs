@@ -36,9 +36,9 @@ data Agents = Agents {
 
 instance FromJSON Agents where
     parseJSON = withObject "agents" $ \o -> do
-        let m = o .: "_embedded"
-        k <-  m
-        let agents = (k:[])
+        embedded <- o .: "_embedded"
+        extractedAgents <-  embedded .: "agents"
+        let agents = [agent | agent <- extractedAgents]
         return Agents{..}
 
 {-
@@ -66,7 +66,7 @@ getAgentsResponse = do
 
 
 
-getAgentDetails = do
+getAgent = do
     x <- getAgentResponse
     let z = decode x :: Maybe Agent
     return z

@@ -4,6 +4,7 @@
 import GHC.Generics
 import Data.Aeson
 import Data.Text.Internal
+import Data.Maybe
 import Control.Lens hiding ((.=))
 import Network.Wreq
 import qualified Data.ByteString.Lazy as Lazy
@@ -76,4 +77,52 @@ getAgents = do
     x <- getAgentsResponse
     let z = decode x :: Maybe Agents
     return z
+
+
+getHostName = do
+    x <- getAgent
+    let k = hostName x
+    return k
+
+
+hostName agent = do
+    (Agent hostname _ _) <- agent
+    Just(hostname)
+
+
+getConfigState = do
+    x <- getAgent
+    let k = configState x
+    return k
+
+
+configState agent = do
+    (Agent _ _ agentConfigState) <- agent
+    Just(agentConfigState)
+
+
+getEnabledAgents = do
+    x <- getAgents
+    let k = enabledAgents x
+    return k
+
+enabledAgents totalAgents = do
+    (Agents agents) <- totalAgents
+    let hostName = [hostName | (Agent hostName _ configState) <- agents, configState == "Enabled"]
+    Just(hostName)
+
+
+getDisabledAgents = do
+    x <- getAgents
+    let k = disabledAgents x
+    return k
+
+disabledAgents totalAgents = do
+    (Agents agents) <- totalAgents
+    let hostName = [hostName | (Agent hostName _ configState) <- agents, configState == "Disabled"]
+    Just(hostName)
+
+
+
+
 
